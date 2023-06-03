@@ -1,0 +1,7 @@
+{
+    "model": "6B-v4",
+    "name": "Sigurd",
+    "opusContextLimit": 2048,
+    "actionTokens": [29],
+    "vocabId": "gpt2-tokenizer"
+}

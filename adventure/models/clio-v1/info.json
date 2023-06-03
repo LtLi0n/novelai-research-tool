@@ -1,0 +1,7 @@
+{
+    "model": "clio-v1",
+    "name": "Clio",
+    "vocabId": "nerdstash_v1-tokenizer",
+    "actionTokens": [49405],
+    "opusContextLimit": 8192
+}

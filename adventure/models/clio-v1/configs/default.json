@@ -1,0 +1,26 @@
+{
+    "model": "clio-v1",
+    "prefix": "vanilla",
+    "temperature": 1.21,
+    "max_length": 60,
+    "min_length": 20,
+    "top_k": 0,
+    "top_p": 0.912,
+    "typical_p": 0.912,
+    "tail_free_sampling": 0.921,
+    "repetition_penalty": 1.21,
+    "repetition_penalty_range": 321,
+    "repetition_penalty_slope": 2.1,
+    "repetition_penalty_frequency": 0.00621,
+    "repetition_penalty_presence": 0,
+    "bad_words_ids": [
+      [85],[49405], [ 3 ], [ 49356 ], [ 1431 ], [ 31715 ], [ 34387 ], 
+      [ 20765 ], [ 30702 ], [ 10691 ], [ 49333 ],
+      [ 1266 ], [ 19438 ], [ 43145 ], [ 26523 ], [ 41471 ], [ 2936 ]
+    ],
+    "use_cache": false,
+    "use_string": false,
+    "return_full_text": false,
+    "num_logprobs": 10,
+    "order": [ 0, 5, 3, 2, 1 ]
+  }

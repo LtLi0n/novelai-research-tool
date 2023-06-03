@@ -1,0 +1,10 @@
+{
+    "id": "default",
+    "prefix": "[ Style: text adventure ]\n",
+    "actions": [
+        {
+            "input": " You look around.\n",
+            "output": "You are in a maze of twisty passages, all alike. There are exits to the north, east, south, and west.\n"
+        }
+    ]
+}
