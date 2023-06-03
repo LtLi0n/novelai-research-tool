@@ -2,16 +2,18 @@ package scenario
 
 import (
 	"encoding/json"
-	"github.com/wbrown/gpt_bpe"
-	"github.com/wbrown/novelai-research-tool/aimodules"
-	novelai_api "github.com/wbrown/novelai-research-tool/novelai-api"
-	"github.com/wbrown/novelai-research-tool/structs"
 	"io/ioutil"
 	"log"
 	"reflect"
 	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/wbrown/gpt_bpe"
+	"github.com/wbrown/novelai-research-tool/aimodules"
+	novelai_api "github.com/wbrown/novelai-research-tool/novelai-api"
+	"github.com/wbrown/novelai-research-tool/structs"
+	"github.com/wbrown/novelai-research-tool/utils"
 )
 
 type ContextConfig struct {
@@ -765,7 +767,7 @@ func (scenario *Scenario) GetEncoder() *gpt_bpe.GPTEncoder {
 	if scenario.Settings.Model != nil {
 		return novelai_api.GetEncoderByModel(*scenario.Settings.Model)
 	} else {
-		return &gpt_bpe.GPT2Encoder
+		return utils.GetEncoderGPT2()
 	}
 }
 

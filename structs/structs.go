@@ -1,6 +1,9 @@
 package structs
 
-import "github.com/wbrown/gpt_bpe"
+import (
+	"github.com/wbrown/gpt_bpe"
+	"github.com/wbrown/novelai-research-tool/utils"
+)
 
 type BiasType uint
 
@@ -41,7 +44,7 @@ func (biasGroups *BiasGroups) RealizeBiases() {
 					Type:      BiasLitString,
 				}
 				phraseString := (*biasGroup.YamlPhrases)[phraseIdx]
-				tokens := gpt_bpe.GPT2Encoder.Encode(&phraseString)
+				tokens := utils.GetEncoderGPT2().Encode(&phraseString)
 				jsonifiedPhrase.Sequences = append(jsonifiedPhrase.Sequences,
 					*tokens)
 				*(*biasGroups)[biasIdx].Phrases = append(

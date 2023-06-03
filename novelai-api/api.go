@@ -17,13 +17,16 @@ import (
 	"github.com/cenkalti/backoff/v4"
 	"github.com/wbrown/gpt_bpe"
 	"github.com/wbrown/novelai-research-tool/structs"
+	"github.com/wbrown/novelai-research-tool/utils"
 )
 
 func GetEncoderByModel(id string) *gpt_bpe.GPTEncoder {
 	if strings.HasPrefix(id, "krake") {
-		return &gpt_bpe.PileEncoder
+		return utils.GetEncoderPile()
+	} else if strings.HasPrefix(id, "clio") {
+		return utils.GetEncoderNerdstashV1()
 	} else {
-		return &gpt_bpe.GPT2Encoder
+		return utils.GetEncoderGPT2()
 	}
 }
 
@@ -152,26 +155,24 @@ func (lprs *LogitProcessorReprs) toIds() (*LogitProcessorIDs, error) {
 }
 
 func (id *LogitProcessorID) UnmarshalJSON(buf []byte) error {
-	var tmp interface{}
-	if err := json.Unmarshal(buf, &tmp); err != nil {
-		return err
-	}
-	if newIntId, ok := tmp.(uint16); ok {
-		logitId := interface{}(newIntId).(LogitProcessorID)
-		id = &logitId
-		return nil
-	} else if repr, ok := tmp.(string); ok {
-		logitRepr := LogitProcessorRepr(repr)
+	var deserialized_uint16 uint16
+	var deserialized_string string
+	if err := json.Unmarshal(buf, &deserialized_uint16); err == nil {
+		logitId := LogitProcessorID(deserialized_uint16)
+		*id = logitId
+	} else if err := json.Unmarshal(buf, &deserialized_string); err == nil {
+		logitRepr := LogitProcessorRepr(deserialized_string)
 		if convId, err := logitRepr.toId(); err != nil {
 			return err
 		} else {
 			newId := convId
 			*id = newId
-			return nil
 		}
 	} else {
 		return errors.New("Logit ID is not a string or an uint!")
 	}
+
+	return nil
 }
 
 func (ids *LogitProcessorIDs) UnmarshalJSON(buf []byte) error {
@@ -427,7 +428,7 @@ func (api *NovelAiAPI) naiApiGenerate(params *NaiGenerateMsg) (
 	respDecoded NaiGenerateHTTPResp) {
 
 	params.Model = *params.Parameters.Model
-	if *params.Parameters.BanBrackets {
+	if params.Parameters.BanBrackets != nil && *params.Parameters.BanBrackets {
 		newBadWords := append(BannedBrackets(params.Model),
 			*params.Parameters.BadWordsIds...)
 		params.Parameters.BadWordsIds = &newBadWords
@@ -523,19 +524,24 @@ func (api *NovelAiAPI) GenerateWithParams(content *string,
 	resp.EncodedRequest = encodedBytes64
 	msg := NewGenerateMsg(encodedBytes64)
 	msg.Parameters = params
+
 	apiResp := api.naiApiGenerate(&msg)
-	if params.NextWord == nil || *params.NextWord == false {
-		if binTokens, err := base64.StdEncoding.DecodeString(apiResp.Output); err != nil {
-			log.Println("ERROR:", err)
-			resp.Error = err
+	resp.EncodedResponse = apiResp.Output
+	resp.Logprobs = apiResp.Logprobs
+
+	// apiResp.Output doesn't contain biases
+	if params.NextWord == nil || !*params.NextWord {
+		// apiResp.Output is encoded to base64
+		if params.UseString != nil && !*params.UseString {
+			if binTokens, err := base64.StdEncoding.DecodeString(apiResp.Output); err != nil {
+				log.Println("ERROR:", err)
+				resp.Error = err
+			} else {
+				tokens := gpt_bpe.TokensFromBin(&binTokens)
+				resp.Response = encoder.Decode(tokens)
+			}
 		} else {
-			tokens := gpt_bpe.TokensFromBin(&binTokens)
-			/* if params.TrimResponses != nil && *params.TrimResponses == true {
-				tokens, err = api.encoder.TrimIncompleteSentence(tokens)
-			} */
-			resp.Logprobs = apiResp.Logprobs
-			resp.EncodedResponse = apiResp.Output
-			resp.Response = encoder.Decode(tokens)
+			resp.Response = apiResp.Output
 		}
 	}
 
