@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/gdamore/tcell/v2"
 	"log"
 	"os"
+
+	"github.com/gdamore/tcell/v2"
 )
 
 func drawText(s tcell.Screen, x1, y1, x2, y2 int, style tcell.Style, text string) {
@@ -65,7 +66,7 @@ type NConsole struct {
 
 func NewConsole() NConsole {
 	defStyle := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)
-	boxStyle := tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorPurple)
+	//boxStyle := tcell.StyleDefault.Foreground(tcell.ColorWhite).Background(tcell.ColorPurple)
 	// Initialize screen
 	s, err := tcell.NewScreen()
 	if err != nil {
